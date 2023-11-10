@@ -1,0 +1,483 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap");
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  outline: none;
+}
+body {
+  font-family: "Poppins", sans-serif;
+  width: 500px;
+  height: 600px;
+  position: relative;
+}
+textarea,
+input,
+button {
+  font-family: "Poppins", sans-serif;
+  display: block;
+}
+input[type="checkbox"],
+input[type="radio"] {
+  display: none;
+}
+.flex {
+  display: flex;
+}
+.flex-col {
+  flex-direction: column;
+}
+.gap-5 {
+  gap: 5px;
+}
+.w-full {
+  width: 100%;
+}
+.justify-center {
+  justify-content: center;
+  justify-content: space-between;
+}
+.justify-between {
+  justify-content: space-between;
+}
+.item-center {
+  align-items: center;
+}
+.hidden {
+  display: none !important;
+}
+.text-center {
+  text-align: center !important;
+}
+.taskToastContent {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.taskToastContent p {
+  font-size: 14px;
+}
+.frequentlyTimeInnerContent .taskToast{
+  min-height: 110px;
+}
+.divider {
+  width: 100%;
+  height: 2px;
+  display: block;
+  background: #fff;
+  margin: 5px 0;
+}
+.wrapper {
+  width: 100%;
+  height: 100%;
+  background: #212121;
+  color: #fff;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+.title {
+  text-align: center;
+  font-size: 25px;
+  padding-bottom: 15px;
+}
+.main {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  gap: 10px;
+}
+.tabs,
+.threeBtnCol {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+}
+label,
+.basicOperation button {
+  width: 100%;
+  padding: 10px 20px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.07);
+  cursor: pointer;
+  border: none;
+  color: #fff;
+  border-radius: 5px;
+  font-size: 16px;
+  user-select: none;
+  transition: all 0.2s ease-in-out;
+}
+label:hover,
+label.active,
+.basicOperation button:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+.tabContents {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.basicOperation {
+  width: 100%;
+  display: flex;
+  gap: 5px;
+}
+.tabContent {
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.07);
+  padding: 10px;
+  border-radius: 5px;
+  display: none;
+  overflow: hidden;
+  transition: all 0.3s ease-in-out;
+}
+.tabContent:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+.tabContent.active {
+  display: block;
+}
+.tabContent .innerTabContent {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+/*=========== Custom scrollbar styles ====================*/
+.tabContent .innerTabContent::-webkit-scrollbar,
+.dayWrapper::-webkit-scrollbar {
+  width: 8px;
+}
+.tabContent .innerTabContent::-webkit-scrollbar-thumb,
+.dayWrapper::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 4px;
+  height: 20px;
+}
+.tabContent .innerTabContent::-webkit-scrollbar-track,
+.dayWrapper::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+.tabContent .innerTabContent::-webkit-scrollbar-corner,
+.dayWrapper::-webkit-scrollbar-corner {
+  background-color: transparent;
+}
+
+.taskToast {
+  width: 100%;
+  padding: 10px;
+  flex-shrink: 0;
+  flex-grow: 0;
+  border-radius: 5px;
+  background: #212121;
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  /* opacity: 0; */
+  /* transform: scale(0); */
+  transition: all 0.3s ease-in-out;
+}
+.taskToast.active {
+  opacity: 1;
+  transform: scale(1);
+}
+.taskToast h3 {
+  font-size: 16px;
+  font-weight: 600;
+}
+.taskOption {
+  transition: all 0.3s ease;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(15px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  z-index: 5;
+  transition: all 0.3s ease;
+}
+.taskToast:hover .taskOption {
+  opacity: 1;
+}
+.taskOption .left {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 16px;
+}
+.frequentlyData {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.taskOption .right {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-end;
+  color: #fff;
+}
+.taskOption .right span {
+  font-size: 20px;
+  fill: #fff;
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 8px;
+  cursor: pointer;
+}
+.taskOption .right span::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: #212121;
+  z-index: -1;
+  transform: scale(0);
+  opacity: 0;
+  border-radius: 100%;
+  transition: all 0.3s ease-in-out;
+}
+.taskOption .right span:hover::before {
+  opacity: 1;
+  transform: scale(1);
+}
+.frequentlyData .daysList {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+}
+.frequentlyData .daysList label {
+  width: 100%;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  text-transform: capitalize;
+  border-radius: 5px;
+  transition: all 0.3s ease-in-out;
+  border-color: transparent;
+}
+.frequentlyData .daysList input:checked ~ label {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #ffffff;
+}
+.frequentlyData .taskOption .left{
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+}
+.frequentlyData .taskOption .left div{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: center;
+  background: #212121;
+  padding: 2px 5px;
+  border-radius: 5px;
+}
+.frequentlyData .taskOption .left div h4{
+  font-size: 14px;
+}
+.frequentlyData .taskOption .left div span{
+  font-size: 13px !important;
+}
+.frequentlyTimeInnerContent p{
+  padding-bottom: 5px;
+}
+
+.popUpWrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  background: rgba(255, 255, 255, 0);
+  transform: translateY(100%);
+  transition: all 0.3s ease-in-out;
+  z-index: 99;
+}
+.popUpWrapper.active {
+  transform: translateY(0);
+}
+.popUpWrapper .popUp {
+  width: 100%;
+  min-height: 300px;
+  padding: 15px;
+  background: #212121;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-bottom: none;
+  position: relative;
+  width: 100%;
+  display: grid;
+  place-items: center;
+  height: 500px;
+}
+
+.hidePopUpIcon {
+  fill: #fff;
+  font-size: 22px;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 40px;
+  height: 40px;
+  padding: 10px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: all 0.3s ease-in-out;
+}
+.hidePopUpIcon svg {
+  position: relative;
+  z-index: 1;
+}
+.hidePopUpIcon::before {
+  content: "";
+  position: absolute;
+  background: rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease-in-out;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  transform: scale(0);
+}
+.hidePopUpIcon:hover::before {
+  transform: scale(1);
+}
+.popUp form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 15px 0;
+}
+input,
+textarea {
+  width: 100%;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  resize: none;
+  transition: all 0.3s ease-in-out;
+}
+input:hover,
+textarea:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+textarea {
+  min-height: 200px;
+  max-height: 200px;
+}
+input::placeholder,
+textarea::placeholder {
+  color: #ffffff;
+}
+.inpWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+button {
+  border: none;
+  background: rgba(255, 255, 255, 0.3);
+  color: #fff;
+  text-transform: capitalize;
+  padding: 8px 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+button:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+#daySchedulType {
+  overflow: hidden;
+  height: 400px;
+}
+.dayWrapper {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding-right: 5px;
+}
+.dayInpBox label {
+  border: 2px solid transparent;
+}
+.pointCheck {
+  width: 20px;
+  height: 20px;
+  background: #ffffff;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 3px solid #212121;
+}
+input:checked ~ label .pointCheck {
+  background: #212121;
+  border: 3px solid #fff;
+}
+input ~ label {
+  border: 2px solid transparent;
+}
+input:checked ~ label {
+  border: 2px solid #fff;
+}
+.errorPopUp,
+.successPopUp {
+  height: auto;
+  text-align: center;
+  padding: 20px 0;
+  z-index: 999;
+}
+.errorText,
+.successText {
+  font-size: 35px;
+}
