@@ -30,6 +30,7 @@ const regularTimeInnerTabContent = document.querySelector(
 const frequentlyTimeInnerContent = document.querySelector(
   ".frequentlyTimeInnerContent"
 );
+
 let formData = {};
 
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -152,7 +153,6 @@ days.forEach((item, i) => {
     </div>
   `;
 });
-
 const dateFormatter = (date) => {
   date = date.split("-");
   return `${date[2] < 10 ? "0" + date[2] : date[2]} ${
@@ -170,17 +170,30 @@ const timeFormatter = (time) => {
 
   return `${time[0]}:${[time[1]]}:${time[2]}`;
 };
+const handleNoItemAdded = (element) => {
+  element.innerHTML = `<h3 class="emptyList">No Item Added</h3>`;
+};
 const generateOneTimeSchedule = () => {
   chrome.storage.local.get("oneTimeSchedule").then((result) => {
     const oneTimeScheduleList = result.oneTimeSchedule || {};
-    oneTimeInnerContent.innerHTML = "";
+    console.log(oneTimeScheduleList);
+
+    handleNoItemAdded(oneTimeInnerContent);
+
+    console.log(Object.keys(oneTimeInnerContent));
+    console.log(Object.keys(oneTimeInnerContent).length);
+
+    if (Object.keys(oneTimeScheduleList).length) {
+      oneTimeInnerContent.innerHTML = "";
+    }
+
     for (let i in oneTimeScheduleList) {
       const taskData = oneTimeScheduleList[i];
       const { taskTitle, taskDescription, taskTime, taskDate } = taskData;
       console.log(taskTitle, taskDescription, taskTime, taskDate);
 
       oneTimeInnerContent.innerHTML += `
-        <div class="taskToast">
+        <div class="taskToast" data-id="oneTimeSchedule-${i}">
           <div class="taskToastContent">
             <h3>${
               taskTitle.length >= 25
@@ -238,7 +251,7 @@ const generateOneTimeSchedule = () => {
         </div>
       `;
     }
-    // regularTimeInnerTabContent
+
     const ovserver = new IntersectionObserver(
       (item) => {
         item.forEach((task) => {
@@ -256,20 +269,24 @@ const generateOneTimeSchedule = () => {
       ovserver.observe(item);
     });
 
-    console.log(oneTimeScheduleList);
+    handleDeleteOption();
   });
 };
 const generateRegularTimeSchedule = () => {
   chrome.storage.local.get("regularTimeSchedule").then((result) => {
-    const oneTimeScheduleList = result.regularTimeSchedule || {};
-    regularTimeInnerTabContent.innerHTML = "";
-    for (let i in oneTimeScheduleList) {
-      const taskData = oneTimeScheduleList[i];
+    const regularTimeScheduleList = result.regularTimeSchedule || {};
+    handleNoItemAdded(regularTimeInnerTabContent);
+
+    if (Object.keys(regularTimeScheduleList).length) {
+      regularTimeInnerTabContent.innerHTML = "";
+    }
+    for (let i in regularTimeScheduleList) {
+      const taskData = regularTimeScheduleList[i];
       const { taskTitle, taskDescription, taskTime } = taskData;
       console.log(taskTitle, taskDescription, taskTime);
 
       regularTimeInnerTabContent.innerHTML += `
-        <div class="taskToast">
+        <div class="taskToast" data-id="regularTimeSchedule-${i}">
           <div class="taskToastContent">
             <h3>${
               taskTitle.length >= 25
@@ -343,10 +360,9 @@ const generateRegularTimeSchedule = () => {
       ovserver.observe(item);
     });
 
-    console.log(oneTimeScheduleList);
+    handleDeleteOption();
   });
 };
-
 const generateDaysSelected = (dayAndTime) => {
   let content = "";
   for (let item of dayAndTime) {
@@ -361,14 +377,18 @@ const generateDaysSelected = (dayAndTime) => {
 const generateFrequentlyTimeSchedule = () => {
   chrome.storage.local.get("frequentlyTimeSchedule").then((result) => {
     const frquentlyTimeScheduleList = result.frequentlyTimeSchedule || {};
-    frequentlyTimeInnerContent.innerHTML = "";
+    handleNoItemAdded(frequentlyTimeInnerContent);
+
+    if (Object.keys(frquentlyTimeScheduleList).length) {
+      frequentlyTimeInnerContent.innerHTML = "";
+    }
     for (let i in frquentlyTimeScheduleList) {
       const taskData = frquentlyTimeScheduleList[i];
       const { taskTitle, taskDescription, dayAndTime } = taskData;
       console.log(taskTitle, taskDescription, dayAndTime);
 
       frequentlyTimeInnerContent.innerHTML += `
-      <div class="taskToast">
+      <div class="taskToast" data-id="frequentlyTimeSchedule-${i}">
         <div class="taskToastContent">
           <h3>${
             taskTitle.length >= 25 ? taskTitle.slice(0, 25) + "..." : taskTitle
@@ -441,6 +461,8 @@ const generateFrequentlyTimeSchedule = () => {
     taskToast.forEach((item) => {
       ovserver.observe(item);
     });
+
+    handleDeleteOption();
   });
 };
 
@@ -495,36 +517,6 @@ const handleAddItemFrequentlyTimeSchedule = (addItemData) => {
       generateFrequentlyTimeSchedule();
     });
   });
-  // handleAddItemGeneral(
-  //   "frequentlyTimeScheduleNo",
-  //   "frequentlyTimeSchedule",
-  //   addItemData,
-  //   generateFrequentlyTimeSchedule
-  // );
-};
-
-const handleAddItemGeneral = (
-  scheduleNoKey,
-  scheduleListKey,
-  addItemData,
-  generateSchedule
-) => {
-  chrome.storage.local.get(scheduleNoKey).then((result) => {
-    const scheduleNo = result.scheduleNoKey || 0;
-    chrome.storage.local.get(scheduleListKey).then((result) => {
-      let timeScheduleList = result.scheduleListKey || {};
-      console.log(timeScheduleList);
-      console.log(scheduleNo);
-      timeScheduleList[scheduleNo] = addItemData;
-      chrome.storage.local.set({
-        scheduleListKey: timeScheduleList,
-      });
-      chrome.storage.local.set({
-        scheduleNoKey: +scheduleNo + 1,
-      });
-      generateSchedule();
-    });
-  });
 };
 
 const handleAddItem = (addItemData) => {
@@ -546,6 +538,7 @@ clearTask.addEventListener("click", () => {
   chrome.storage.local.remove("frequentlyTimeSchedule");
   generateOneTimeSchedule();
   generateRegularTimeSchedule();
+  generateFrequentlyTimeSchedule();
 });
 
 addTask.addEventListener("click", (e) => {
@@ -686,6 +679,39 @@ daySchedulType.addEventListener("submit", (e) => {
     errorPopUpText.innerHTML = "Please fill atleast one of the following";
   }
 });
+
+const handleDeleteOption = () => {
+  const deleteBtns = Array.from(document.querySelectorAll(".delete"));
+  deleteBtns.forEach((item, i) => {
+    item.addEventListener("click", (e) => {
+      let parentTaskToast = item;
+      while (parentTaskToast) {
+        if (parentTaskToast.classList.contains("taskToast")) break;
+        parentTaskToast = parentTaskToast.parentElement;
+      }
+      console.log(parentTaskToast);
+      const dataId = parentTaskToast.getAttribute("data-id");
+      console.log(dataId);
+      const [taskCategory, taskId] = dataId.split("-");
+      console.log(taskCategory, taskId);
+
+      chrome.storage.local.get(taskCategory).then((result) => {
+        const categoryDataList = result[taskCategory] || {};
+        console.log(categoryDataList);
+        delete categoryDataList[taskId];
+        chrome.storage.local
+          .set({ [taskCategory]: categoryDataList })
+          .then(() => {
+            if (taskCategory === "oneTimeSchedule") generateOneTimeSchedule();
+            else if (taskCategory === "regularTimeSchedule")
+              generateRegularTimeSchedule();
+            else generateFrequentlyTimeSchedule();
+          });
+      });
+    });
+  });
+};
+
 generateOneTimeSchedule();
 generateRegularTimeSchedule();
 generateFrequentlyTimeSchedule();
