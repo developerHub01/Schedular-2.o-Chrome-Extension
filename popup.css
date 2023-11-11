@@ -9,6 +9,7 @@ body {
   font-family: "Poppins", sans-serif;
   width: 500px;
   height: 600px;
+  overflow: hidden;
   position: relative;
 }
 textarea,
@@ -444,7 +445,7 @@ button:hover {
   background: #212121;
   border-radius: 5px;
 }
-#daySchedulType {
+.daySchedulType {
   overflow: hidden;
   height: 400px;
 }

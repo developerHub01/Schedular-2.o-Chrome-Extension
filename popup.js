@@ -32,8 +32,20 @@ const frequentlyTimeInnerContent = document.querySelector(
 );
 const viewItem = document.querySelector(".viewItem");
 const viewDetailsForm = document.querySelector("#viewDetailsForm");
+const updateTitleDescription = document.querySelector(
+  ".updateTitleDescription"
+);
+const updateTitleDescriptionForm = document.querySelector(
+  "#updateTitleDescriptionForm"
+);
+const updateDateSchedule = document.querySelector(".updateDateSchedule");
+const updateDateScheduleForm = document.querySelector(
+  "#updateDateScheduleForm"
+);
 
 let formData = {};
+let updateFormData = {};
+let updateDataTaskId = null;
 
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -162,11 +174,17 @@ const dateFormatter = (date) => {
 };
 const timeFormatter = (time) => {
   time = time.split(":");
-  time[2] = time[0] <= 12 ? "AM" : "PM";
-  time[0] = time[0] <= 12 ? 12 : time[0] - 12;
 
-  time[0] = time[0] < 10 ? "0" + +time[0] : time[0];
+  time[2] = time[0] <= 12 ? "AM" : "PM";
   time[1] = time[1] < 10 ? "0" + +time[1] : time[1];
+  time[0] =
+    +time[0] <= 12
+      ? +time[0] < 10
+        ? "0" + +time[0]
+        : +time[0]
+      : time[0] - 12 < 10
+      ? "0" + (time[0] - 12)
+      : time[0] - 12;
 
   return `${time[0]}:${[time[1]]}:${time[2]}`;
 };
@@ -197,14 +215,14 @@ const generateOneTimeSchedule = () => {
         <div class="taskToast" data-id="oneTimeSchedule-${i}">
           <div class="taskToastContent">
             <h3>${
-              taskTitle.length >= 25
-                ? taskTitle.slice(0, 25) + "..."
+              taskTitle?.length >= 25
+                ? taskTitle?.slice(0, 25) + "..."
                 : taskTitle
             }</h3>
             <span class="divider"></span>
             <p>${
-              taskDescription.length >= 25
-                ? taskDescription.slice(0, 30) + "..."
+              taskDescription?.length >= 25
+                ? taskDescription?.slice(0, 30) + "..."
                 : taskDescription
             }</p>
           </div>
@@ -288,14 +306,14 @@ const generateRegularTimeSchedule = () => {
         <div class="taskToast" data-id="regularTimeSchedule-${i}">
           <div class="taskToastContent">
             <h3>${
-              taskTitle.length >= 25
-                ? taskTitle.slice(0, 25) + "..."
+              taskTitle?.length >= 25
+                ? taskTitle?.slice(0, 25) + "..."
                 : taskTitle
             }</h3>
             <span class="divider"></span>
             <p>${
-              taskDescription.length >= 25
-                ? taskDescription.slice(0, 30) + "..."
+              taskDescription?.length >= 25
+                ? taskDescription?.slice(0, 30) + "..."
                 : taskDescription
             }</p>
           </div>
@@ -371,7 +389,6 @@ const generateDaysSelected = (dayAndTime) => {
   }
   return content;
 };
-
 const generateFrequentlyTimeSchedule = () => {
   chrome.storage.local.get("frequentlyTimeSchedule").then((result) => {
     const frquentlyTimeScheduleList = result.frequentlyTimeSchedule || {};
@@ -388,12 +405,14 @@ const generateFrequentlyTimeSchedule = () => {
       <div class="taskToast" data-id="frequentlyTimeSchedule-${i}">
         <div class="taskToastContent">
           <h3>${
-            taskTitle.length >= 25 ? taskTitle.slice(0, 25) + "..." : taskTitle
+            taskTitle?.length >= 25
+              ? taskTitle?.slice(0, 25) + "..."
+              : taskTitle
           }</h3>
           <span class="divider"></span>
           <p>${
-            taskDescription.length >= 25
-              ? taskDescription.slice(0, 30) + "..."
+            taskDescription?.length >= 25
+              ? taskDescription?.slice(0, 30) + "..."
               : taskDescription
           }</p>
         </div>
@@ -463,17 +482,23 @@ const generateFrequentlyTimeSchedule = () => {
 };
 
 const handleAddItemOneTimeSchedule = (addItemData) => {
+  console.log(addItemData);
   chrome.storage.local.get("oneTimeScheduleNo").then((result) => {
-    const scheduleNo = result.oneTimeScheduleNo || 0;
+    const scheduleNo = updateDataTaskId || result.oneTimeScheduleNo || 0;
     chrome.storage.local.get("oneTimeSchedule").then((result) => {
       let oneTimeScheduleList = result.oneTimeSchedule || {};
-      oneTimeScheduleList[scheduleNo] = addItemData;
+      oneTimeScheduleList[scheduleNo] = {
+        ...oneTimeScheduleList[scheduleNo],
+        ...addItemData,
+      };
       chrome.storage.local.set({
         oneTimeSchedule: oneTimeScheduleList,
       });
       chrome.storage.local.set({
         oneTimeScheduleNo: +scheduleNo + 1,
       });
+      updateDataTaskId = null;
+      updateFormData = {};
       generateOneTimeSchedule();
     });
   });
@@ -695,24 +720,6 @@ const handleDeleteOption = () => {
     });
   });
 };
-const handleUpdateOption = () => {
-  const editBtns = Array.from(document.querySelectorAll(".edit"));
-  editBtns.forEach((item) => {
-    item.addEventListener("click", (e) => {
-      const [taskCategory, taskId] = getDataTaskToast(item);
-      chrome.storage.local.get(taskCategory).then((result) => {
-        const categoryDataList = result[taskCategory] || {};
-        const { taskTitle, taskDescription } = categoryDataList[taskId];
-        viewItem.classList.add("active");
-        addTaskItemForm.querySelector("input").value = taskTitle;
-        addTaskItemForm.querySelector("textarea").value = taskDescription;
-        console.log(taskCategory, taskId);
-        addItem.classList.add("active");
-        // addTaskItemForm.querySelector('input').value = 
-      });
-    });
-  });
-};
 const handleViewDetailsOption = () => {
   const viewDetailsBtns = Array.from(document.querySelectorAll(".view"));
   viewDetailsBtns.forEach((item) => {
@@ -728,7 +735,53 @@ const handleViewDetailsOption = () => {
     });
   });
 };
-
+const handleUpdateOption = () => {
+  const editBtns = Array.from(document.querySelectorAll(".edit"));
+  editBtns.forEach((item) => {
+    item.addEventListener("click", (e) => {
+      const [taskCategory, taskId] = getDataTaskToast(item);
+      chrome.storage.local.get(taskCategory).then((result) => {
+        const categoryDataList = result[taskCategory] || {};
+        updateFormData = { ...categoryDataList[taskId] };
+        updateDataTaskId = taskId;
+        console.log(updateFormData);
+        const { taskTitle, taskDescription } = categoryDataList[taskId];
+        console.log(taskCategory, taskId);
+        updateTitleDescription.classList.add("active");
+        updateTitleDescriptionForm.querySelector("input").value = taskTitle;
+        updateTitleDescriptionForm.querySelector("textarea").value =
+          taskDescription;
+      });
+    });
+  });
+};
+updateTitleDescriptionForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  updateFormData = {};
+  for (let i = 0; i < e.target.length - 1; i++) {
+    const inputItem = e.target[i];
+    updateFormData[inputItem.name] = inputItem.value;
+  }
+  updateTitleDescription.classList.remove("active");
+  if (updateFormData.scheduleTypeFormData === "oneTime") {
+    updateDateSchedule.classList.add("active");
+    updateDateScheduleForm.querySelectorAll("input")[0].value =
+      updateFormData.taskTime;
+    updateDateScheduleForm.querySelectorAll("input")[1].value =
+      updateFormData.taskDate;
+  } else if (updateFormData.scheduleTypeFormData === "regularTime") {
+  } else {
+  }
+});
+updateDateScheduleForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  for (let i = 0; i < e.target.length - 1; i++) {
+    const inputItem = e.target[i];
+    updateFormData[inputItem.name] = inputItem.value;
+  }
+  handleAddItemOneTimeSchedule(updateFormData);
+  updateDateSchedule.classList.remove("active");
+});
 generateOneTimeSchedule();
 generateRegularTimeSchedule();
 generateFrequentlyTimeSchedule();
