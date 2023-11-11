@@ -228,6 +228,8 @@ const handleNoItemAdded = (element) => {
 };
 const generateOneTimeSchedule = () => {
   chrome.storage.local.get("oneTimeSchedule").then((result) => {
+    chrome.runtime.sendMessage({ scheduleType: "oneTimeSchedule" });
+
     const oneTimeScheduleList = result.oneTimeSchedule || {};
 
     handleNoItemAdded(oneTimeInnerContent);
@@ -321,6 +323,8 @@ const generateOneTimeSchedule = () => {
 };
 const generateRegularTimeSchedule = () => {
   chrome.storage.local.get("regularTimeSchedule").then((result) => {
+    chrome.runtime.sendMessage({ scheduleType: "regularTimeSchedule" });
+
     const regularTimeScheduleList = result.regularTimeSchedule || {};
     handleNoItemAdded(regularTimeInnerTabContent);
 
@@ -420,6 +424,8 @@ const generateDaysSelected = (dayAndTime) => {
 };
 const generateFrequentlyTimeSchedule = () => {
   chrome.storage.local.get("frequentlyTimeSchedule").then((result) => {
+    chrome.runtime.sendMessage({ scheduleType: "frequentlyTimeSchedule" });
+
     const frquentlyTimeScheduleList = result.frequentlyTimeSchedule || {};
     handleNoItemAdded(frequentlyTimeInnerContent);
 
@@ -853,3 +859,9 @@ updateDayScheduleForm.addEventListener("submit", (e) => {
 generateOneTimeSchedule();
 generateRegularTimeSchedule();
 generateFrequentlyTimeSchedule();
+
+chrome.runtime.onMessage.addListener(({ type }, sender, sendResponse) => {
+  if (type === "oneTimeSchedule") generateOneTimeSchedule();
+  else if (type === "regularTimeSchedule") generateRegularTimeSchedule();
+  else generateFrequentlyTimeSchedule();
+});
