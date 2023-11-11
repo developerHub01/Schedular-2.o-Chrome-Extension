@@ -15,7 +15,7 @@ const dateSchedulePopUp = document.querySelector(".dateSchedulePopUp");
 const daySchedulePopUp = document.querySelector(".daySchedulePopUp");
 const timeSchedulePopUp = document.querySelector(".timeSchedulePopUp");
 const timeScheduleType = document.querySelector("#timeScheduleType");
-const dayWrapper = document.querySelector(".dayWrapper");
+const dayWrapper = document.querySelectorAll(".dayWrapper");
 const daySchedulType = document.querySelector("#daySchedulType");
 const errorPopUp = document.querySelector(".errorPopUp");
 const errorPopUpText = errorPopUp.querySelector(".errorText");
@@ -42,6 +42,12 @@ const updateDateSchedule = document.querySelector(".updateDateSchedule");
 const updateDateScheduleForm = document.querySelector(
   "#updateDateScheduleForm"
 );
+const updateTimeSchedule = document.querySelector(".updateTimeSchedule");
+const updateTimeScheduleForm = document.querySelector(
+  "#updateTimeScheduleForm"
+);
+const updateDaySchedule = document.querySelector(".updateDaySchedule");
+const updateDayScheduleForm = document.querySelector("#updateDayScheduleForm");
 
 let formData = {};
 let updateFormData = {};
@@ -143,29 +149,52 @@ taskTypeForm.forEach((item, i) => {
   });
 });
 
-dayWrapper.innerHTML = "";
-days.forEach((item, i) => {
-  dayWrapper.innerHTML += `
-    <div class="dayInpBox">
-      <input
-        type="checkbox"
-        name="scheduleDay"
-        id="${item}"
-        value="${i}"
-      />
-      <label for="${item}" class="flex justify-between item-center">
-        <span class="pointCheck"></span>
-        <h4 class="w-full">${item}</h4>
+dayWrapper.forEach((wrapper, i) => {
+  let idPrefix = "add";
+  if (i) idPrefix = "update";
+  wrapper.innerHTML = "";
+  days.forEach((item, i) => {
+    wrapper.innerHTML += `
+      <div class="dayInpBox">
         <input
-          type="time"
-          name="taskTime"
-          id="taskTime"
-          class="w-full text-center"
+          type="checkbox"
+          name="scheduleDay"
+          id="${idPrefix}_${item}"
+          value="${i}"
         />
-      </label>
-    </div>
-  `;
+        <label for="${idPrefix}_${item}" class="flex justify-between item-center">
+          <span class="pointCheck"></span>
+          <h4 class="w-full">${item}</h4>
+          <input
+            type="time"
+            name="taskTime"
+            id="taskTime"
+            class="w-full text-center"
+          />
+        </label>
+      </div>
+    `;
+  });
 });
+
+const handleDayData = (target) => {
+  const dayData = [];
+  for (let i = 0; i < target.length - 1; i += 2) {
+    if (!target[i].checked && !target[i + 1].value) {
+      continue;
+    } else if (target[i].checked && target[i + 1].value) {
+      dayData.push({
+        day: target[i].value,
+        time: target[i + 1].value,
+      });
+    } else {
+      errorPopUp.classList.add("active");
+      errorPopUpText.innerHTML = `If you select any day then must select it's time`;
+    }
+  }
+  return dayData;
+};
+
 const dateFormatter = (date) => {
   date = date.split("-");
   return `${date[2] < 10 ? "0" + +date[2] : +date[2]} ${
@@ -482,7 +511,6 @@ const generateFrequentlyTimeSchedule = () => {
 };
 
 const handleAddItemOneTimeSchedule = (addItemData) => {
-  console.log(addItemData);
   chrome.storage.local.get("oneTimeScheduleNo").then((result) => {
     const scheduleNo = updateDataTaskId || result.oneTimeScheduleNo || 0;
     chrome.storage.local.get("oneTimeSchedule").then((result) => {
@@ -505,16 +533,21 @@ const handleAddItemOneTimeSchedule = (addItemData) => {
 };
 const handleAddItemRegularTimeSchedule = (addItemData) => {
   chrome.storage.local.get("regularTimeScheduleNo").then((result) => {
-    const scheduleNo = result.regularTimeScheduleNo || 0;
+    const scheduleNo = updateDataTaskId || result.regularTimeScheduleNo || 0;
     chrome.storage.local.get("regularTimeSchedule").then((result) => {
       let regularTimeScheduleList = result.regularTimeSchedule || {};
-      regularTimeScheduleList[scheduleNo] = addItemData;
+      regularTimeScheduleList[scheduleNo] = {
+        ...regularTimeScheduleList[scheduleNo],
+        ...addItemData,
+      };
       chrome.storage.local.set({
         regularTimeSchedule: regularTimeScheduleList,
       });
       chrome.storage.local.set({
         regularTimeScheduleNo: +scheduleNo + 1,
       });
+      updateDataTaskId = null;
+      updateFormData = {};
       generateRegularTimeSchedule();
     });
   });
@@ -652,20 +685,7 @@ dateScheduleType.addEventListener("submit", (e) => {
 daySchedulType.addEventListener("submit", (e) => {
   e.preventDefault();
   errorPopUp.classList.remove("active");
-  const dayData = [];
-  for (let i = 0; i < e.target.length - 1; i += 2) {
-    if (!e.target[i].checked && !e.target[i + 1].value) {
-      continue;
-    } else if (e.target[i].checked && e.target[i + 1].value) {
-      dayData.push({
-        day: e.target[i].value,
-        time: e.target[i + 1].value,
-      });
-    } else {
-      errorPopUp.classList.add("active");
-      errorPopUpText.innerHTML = `If you select any day then must select it's time`;
-    }
-  }
+  const dayData = handleDayData(e.target);
   if (dayData.length) {
     e.target.reset();
     formData.dayAndTime = dayData;
@@ -757,11 +777,13 @@ const handleUpdateOption = () => {
 };
 updateTitleDescriptionForm.addEventListener("submit", (e) => {
   e.preventDefault();
-  updateFormData = {};
   for (let i = 0; i < e.target.length - 1; i++) {
     const inputItem = e.target[i];
     updateFormData[inputItem.name] = inputItem.value;
   }
+
+  console.log(updateFormData);
+
   updateTitleDescription.classList.remove("active");
   if (updateFormData.scheduleTypeFormData === "oneTime") {
     updateDateSchedule.classList.add("active");
@@ -770,7 +792,29 @@ updateTitleDescriptionForm.addEventListener("submit", (e) => {
     updateDateScheduleForm.querySelectorAll("input")[1].value =
       updateFormData.taskDate;
   } else if (updateFormData.scheduleTypeFormData === "regularTime") {
+    updateTimeSchedule.classList.add("active");
+    updateTimeScheduleForm.querySelector("input").value =
+      updateFormData.taskTime;
   } else {
+    updateDaySchedule.classList.add("active");
+    console.log(updateDayScheduleForm);
+
+    const { dayAndTime } = updateFormData;
+
+    const dayInpBoxs = Array.from(
+      updateDayScheduleForm.querySelectorAll(".dayInpBox")
+    );
+
+    dayAndTime.forEach((item, i) => {
+      console.log(item);
+      const { day, time } = item;
+      const dayInpBoxDay = dayInpBoxs[day].querySelector(
+        "input[type='checkbox']"
+      );
+      const dayInpBoxTime = dayInpBoxs[day].querySelector("input[type='time']");
+      dayInpBoxDay.checked = true;
+      dayInpBoxTime.value = time;
+    });
   }
 });
 updateDateScheduleForm.addEventListener("submit", (e) => {
@@ -781,6 +825,27 @@ updateDateScheduleForm.addEventListener("submit", (e) => {
   }
   handleAddItemOneTimeSchedule(updateFormData);
   updateDateSchedule.classList.remove("active");
+});
+updateTimeScheduleForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  for (let i = 0; i < e.target.length - 1; i++) {
+    const inputItem = e.target[i];
+    updateFormData[inputItem.name] = inputItem.value;
+  }
+  handleAddItemRegularTimeSchedule(updateFormData);
+  updateTimeSchedule.classList.remove("active");
+});
+updateDayScheduleForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const dayData = handleDayData(e.target);
+  if (dayData.length) {
+    updateFormData.dayAndTime = dayData;
+    handleAddItemFrequentlyTimeSchedule(updateFormData);
+    updateDaySchedule.classList.remove("active");
+  } else {
+    errorPopUp.classList.add("active");
+    errorPopUpText.innerHTML = "Please fill atleast one of the following";
+  }
 });
 generateOneTimeSchedule();
 generateRegularTimeSchedule();
