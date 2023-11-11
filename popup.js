@@ -554,10 +554,13 @@ const handleAddItemRegularTimeSchedule = (addItemData) => {
 };
 const handleAddItemFrequentlyTimeSchedule = (addItemData) => {
   chrome.storage.local.get("frequentlyTimeScheduleNo").then((result) => {
-    const scheduleNo = result.frequentlyTimeScheduleNo || 0;
+    const scheduleNo = updateDataTaskId || result.frequentlyTimeScheduleNo || 0;
     chrome.storage.local.get("frequentlyTimeSchedule").then((result) => {
       let frequentlyTimeScheduleList = result.frequentlyTimeSchedule || {};
-      frequentlyTimeScheduleList[scheduleNo] = addItemData;
+      frequentlyTimeScheduleList[scheduleNo] = {
+        ...frequentlyTimeScheduleList[scheduleNo],
+        ...addItemData,
+      };
       chrome.storage.local.set({
         frequentlyTimeSchedule: frequentlyTimeScheduleList,
       });
