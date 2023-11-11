@@ -1,5 +1,5 @@
 {
-  "name": "Schedular",
+  "name": "Schedular 2.o",
   "description": "It is used to make Schedule work. At your working time it will show an notification to reminde you about your schedule. You can create schedule update already existing schedule or delete any schedule",
   "version": "1.0",
   "manifest_version": 3,
@@ -11,7 +11,7 @@
       "24": "images/assets/24.png",
       "16": "images/assets/16.png"
     },
-    "default_title": "Schedular",
+    "default_title": "Schedular 0.o",
     "default_popup": "popup.html"
   },
   "background": {
