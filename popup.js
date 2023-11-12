@@ -773,9 +773,7 @@ const handleUpdateOption = () => {
         const categoryDataList = result[taskCategory] || {};
         updateFormData = { ...categoryDataList[taskId] };
         updateDataTaskId = taskId;
-        console.log(updateFormData);
         const { taskTitle, taskDescription } = categoryDataList[taskId];
-        console.log(taskCategory, taskId);
         updateTitleDescription.classList.add("active");
         updateTitleDescriptionForm.querySelector("input").value = taskTitle;
         updateTitleDescriptionForm.querySelector("textarea").value =
@@ -791,8 +789,6 @@ updateTitleDescriptionForm.addEventListener("submit", (e) => {
     updateFormData[inputItem.name] = inputItem.value;
   }
 
-  console.log(updateFormData);
-
   updateTitleDescription.classList.remove("active");
   if (updateFormData.scheduleTypeFormData === "oneTime") {
     updateDateSchedule.classList.add("active");
@@ -806,7 +802,6 @@ updateTitleDescriptionForm.addEventListener("submit", (e) => {
       updateFormData.taskTime;
   } else {
     updateDaySchedule.classList.add("active");
-    console.log(updateDayScheduleForm);
 
     const { dayAndTime } = updateFormData;
 
@@ -815,7 +810,6 @@ updateTitleDescriptionForm.addEventListener("submit", (e) => {
     );
 
     dayAndTime.forEach((item, i) => {
-      console.log(item);
       const { day, time } = item;
       const dayInpBoxDay = dayInpBoxs[day].querySelector(
         "input[type='checkbox']"
