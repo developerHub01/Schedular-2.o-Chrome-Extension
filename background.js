@@ -12,6 +12,9 @@ const handleAlarmsForOneTime = () => {
     if (!scheduleList) return;
     Object.keys(scheduleList).forEach((item) => {
       chrome.alarms.clear(`${item}-oneTimeSchedule`);
+      
+      if(!scheduleList[item]) return;
+
       const { taskDate, taskTime } = scheduleList[item];
 
       const scheduledTime = new Date(`${taskDate}T${taskTime}:00`);
@@ -39,6 +42,9 @@ const handleAlarmsForRegularTime = () => {
     if (!scheduleList) return;
     Object.keys(scheduleList).forEach((item) => {
       chrome.alarms.clear(`${item}-regularTimeSchedule`);
+
+      if(!scheduleList[item]) return;
+
       const { taskTime } = scheduleList[item];
       const [hours, minutes] = taskTime.split(":");
       const scheduledTime = new Date();
@@ -61,6 +67,7 @@ const handleAlarmsForFrequentlyTime = () => {
 
     if (!scheduleList) return;
     Object.keys(scheduleList).forEach((item) => {
+      if(!scheduleList[item]) return;
       const { dayAndTime } = scheduleList[item];
 
       // It is need to be clear because someting after updating it might be reamin some alarm that set previously but rececntly it is unselected so so that alarm should be clear
@@ -68,6 +75,8 @@ const handleAlarmsForFrequentlyTime = () => {
         chrome.alarms.clear(`${i}_${item}-frequentlyTimeSchedule`);
 
       dayAndTime.forEach((eachDayAndTime) => {
+        if(!eachDayAndTime) return;
+
         const { day, time } = eachDayAndTime;
 
         const [hours, minutes] = time.split(":");
@@ -90,7 +99,7 @@ const handleAlarmsForFrequentlyTime = () => {
   });
 };
 chrome.alarms.onAlarm.addListener((alarm) => {
-  let [id, scheduleType] = alarm?.name.split("-");
+  let [id, scheduleType] = alarm?.name?.split("-");
 
   if (scheduleType === "oneTimeSchedule")
     handleNotificationTriggerOneTime(id, scheduleType);
