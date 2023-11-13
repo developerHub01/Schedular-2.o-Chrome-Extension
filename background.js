@@ -1,11 +1,13 @@
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.scheduleType === "oneTimeSchedule") handleAlarmsForOneTime();
-  else if (message.scheduleType === "regularTimeSchedule")
-    handleAlarmsForRegularTime();
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  console.log(Object.keys(changes)[0] === "oneTimeSchedule");
+  const scheduleType = Object.keys(changes)[0];
+  if (scheduleType === "oneTimeSchedule") handleAlarmsForOneTime();
+  else if (scheduleType === "regularTimeSchedule") handleAlarmsForRegularTime();
   else handleAlarmsForFrequentlyTime();
 });
 
 const handleAlarmsForOneTime = () => {
+  console.log("one time");
   chrome.storage.local.get("oneTimeSchedule").then((result) => {
     const scheduleList = result.oneTimeSchedule;
 
@@ -17,16 +19,16 @@ const handleAlarmsForOneTime = () => {
       const scheduledTime = new Date(`${taskDate}T${taskTime}:00`);
 
       const currentTime = new Date().getTime();
-      const delay = scheduledTime - currentTime;
+      const timeGap = scheduledTime - currentTime;
 
-      if (delay <= 0) {
+      if (timeGap <= 0) {
         delete scheduleList[item];
         chrome.storage.local.set({
           oneTimeSchedule: scheduleList,
         });
       } else {
         chrome.alarms.create(`${item}-oneTimeSchedule`, {
-          when: currentTime + delay,
+          when: currentTime + timeGap,
         });
       }
     });
@@ -38,15 +40,15 @@ const handleAlarmsForRegularTime = () => {
 
     if (!scheduleList) return;
     Object.keys(scheduleList).forEach((item) => {
+      chrome.alarms.clear(`${item}-regularTimeSchedule`);
       const { taskTime } = scheduleList[item];
       const [hours, minutes] = taskTime.split(":");
       const scheduledTime = new Date();
       scheduledTime.setHours(hours, minutes, 0, 0);
       const currentTime = new Date();
 
-      if (scheduledTime < currentTime) {
+      if (scheduledTime < currentTime)
         scheduledTime.setDate(scheduledTime.getDate() + 1);
-      }
       const timeGap = scheduledTime - currentTime;
       chrome.alarms.create(`${item}-regularTimeSchedule`, {
         when: Date.now() + timeGap,
@@ -56,13 +58,13 @@ const handleAlarmsForRegularTime = () => {
   });
 };
 const handleAlarmsForFrequentlyTime = () => {
+  console.log("frequently");
   chrome.storage.local.get("frequentlyTimeSchedule").then((result) => {
     const scheduleList = result.frequentlyTimeSchedule;
 
     if (!scheduleList) return;
     Object.keys(scheduleList).forEach((item) => {
-      const schedule = scheduleList[item];
-      const { dayAndTime } = schedule;
+      const { dayAndTime } = scheduleList[item];
 
       // It is need to be clear because someting after updating it might be reamin some alarm that set previously but rececntly it is unselected so so that alarm should be clear
       for (let i = 0; i < 7; i++)
@@ -81,7 +83,7 @@ const handleAlarmsForFrequentlyTime = () => {
 
         const timeGap = scheduledTime - currentTime;
 
-        if (timeGap > 0)
+        if (timeGap >= 0)
           chrome.alarms.create(`${day}_${item}-frequentlyTimeSchedule`, {
             when: Date.now() + timeGap,
             periodInMinutes: 7 * 24 * 60,
@@ -100,16 +102,13 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 const handleNotificationTriggerOneTime = (id, scheduleType) => {
   chrome.storage.local.get(scheduleType).then((result) => {
     const schedules = result[scheduleType];
-    const scheduleData = schedules[id];
 
-    notification(scheduleData.taskTitle, scheduleData.taskDescription);
+    const { taskTitle, taskDescription } = schedules[id];
+
+    notification(taskTitle, taskDescription, scheduleType);
     delete schedules[id];
 
     chrome.storage.local.set({ [scheduleType]: schedules });
-
-    chrome.runtime.sendMessage({
-      type: scheduleType,
-    });
   });
 };
 const handleNotificationTriggerRegularTimeAndFrequentlyTime = (
@@ -119,19 +118,26 @@ const handleNotificationTriggerRegularTimeAndFrequentlyTime = (
   if (scheduleType === "frequentlyTimeSchedule") id = id.split("_")[1];
   chrome.storage.local.get(scheduleType).then((result) => {
     const schedules = result[scheduleType];
-    const scheduleData = schedules[id];
+    const { taskTitle, taskDescription } = schedules[id];
 
-    notification(scheduleData.taskTitle, scheduleData.taskDescription);
+    notification(taskTitle, taskDescription, scheduleType);
   });
 };
 
-const notification = (title, description) => {
+const notification = (title, description, scheduleType) => {
+  let bannerImg = "";
+  if (scheduleType === "oneTimeSchedule")
+    bannerImg = chrome.runtime.getURL("images/oneTimeBanner.png");
+  else if (scheduleType === "regularTimeSchedule")
+    bannerImg = chrome.runtime.getURL("images/regularTimeBanner.png");
+  else bannerImg = chrome.runtime.getURL("images/frequentlyTimeBanner.png");
   const notificationOptions = {
-    type: "basic",
+    type: "image",
     title: title,
     message: description,
-    iconUrl: "images/assets/128.png",
+    iconUrl: chrome.runtime.getURL("images/assets/128.png"),
+    imageUrl: bannerImg,
   };
 
-  chrome.notifications.create("", notificationOptions);
+  chrome.notifications.create(notificationOptions);
 };

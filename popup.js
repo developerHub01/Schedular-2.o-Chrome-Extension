@@ -228,8 +228,6 @@ const handleNoItemAdded = (element) => {
 };
 const generateOneTimeSchedule = () => {
   chrome.storage.local.get("oneTimeSchedule").then((result) => {
-    chrome.runtime.sendMessage({ scheduleType: "oneTimeSchedule" });
-
     const oneTimeScheduleList = result.oneTimeSchedule || {};
 
     handleNoItemAdded(oneTimeInnerContent);
@@ -246,14 +244,14 @@ const generateOneTimeSchedule = () => {
         <div class="taskToast" data-id="oneTimeSchedule-${i}">
           <div class="taskToastContent">
             <h3>${
-              taskTitle?.length >= 25
-                ? taskTitle?.slice(0, 25) + "..."
+              taskTitle?.length >= 45
+                ? taskTitle?.slice(0, 45) + "..."
                 : taskTitle
             }</h3>
             <span class="divider"></span>
             <p>${
-              taskDescription?.length >= 25
-                ? taskDescription?.slice(0, 30) + "..."
+              taskDescription?.length >= 50
+                ? taskDescription?.slice(0, 50) + "..."
                 : taskDescription
             }</p>
           </div>
@@ -323,8 +321,6 @@ const generateOneTimeSchedule = () => {
 };
 const generateRegularTimeSchedule = () => {
   chrome.storage.local.get("regularTimeSchedule").then((result) => {
-    chrome.runtime.sendMessage({ scheduleType: "regularTimeSchedule" });
-
     const regularTimeScheduleList = result.regularTimeSchedule || {};
     handleNoItemAdded(regularTimeInnerTabContent);
 
@@ -339,14 +335,14 @@ const generateRegularTimeSchedule = () => {
         <div class="taskToast" data-id="regularTimeSchedule-${i}">
           <div class="taskToastContent">
             <h3>${
-              taskTitle?.length >= 25
-                ? taskTitle?.slice(0, 25) + "..."
+              taskTitle?.length >= 45
+                ? taskTitle?.slice(0, 45) + "..."
                 : taskTitle
             }</h3>
             <span class="divider"></span>
             <p>${
-              taskDescription?.length >= 25
-                ? taskDescription?.slice(0, 30) + "..."
+              taskDescription?.length >= 50
+                ? taskDescription?.slice(0, 50) + "..."
                 : taskDescription
             }</p>
           </div>
@@ -424,8 +420,6 @@ const generateDaysSelected = (dayAndTime) => {
 };
 const generateFrequentlyTimeSchedule = () => {
   chrome.storage.local.get("frequentlyTimeSchedule").then((result) => {
-    chrome.runtime.sendMessage({ scheduleType: "frequentlyTimeSchedule" });
-
     const frquentlyTimeScheduleList = result.frequentlyTimeSchedule || {};
     handleNoItemAdded(frequentlyTimeInnerContent);
 
@@ -440,14 +434,14 @@ const generateFrequentlyTimeSchedule = () => {
       <div class="taskToast" data-id="frequentlyTimeSchedule-${i}">
         <div class="taskToastContent">
           <h3>${
-            taskTitle?.length >= 25
-              ? taskTitle?.slice(0, 25) + "..."
+            taskTitle?.length >= 45
+              ? taskTitle?.slice(0, 45) + "..."
               : taskTitle
           }</h3>
           <span class="divider"></span>
           <p>${
-            taskDescription?.length >= 25
-              ? taskDescription?.slice(0, 30) + "..."
+            taskDescription?.length >= 50
+              ? taskDescription?.slice(0, 50) + "..."
               : taskDescription
           }</p>
         </div>
@@ -854,8 +848,11 @@ generateOneTimeSchedule();
 generateRegularTimeSchedule();
 generateFrequentlyTimeSchedule();
 
-chrome.runtime.onMessage.addListener(({ type }, sender, sendResponse) => {
-  if (type === "oneTimeSchedule") generateOneTimeSchedule();
-  else if (type === "regularTimeSchedule") generateRegularTimeSchedule();
+chrome.storage.onChanged.addListener((changes, area) => {
+  console.log(changes);
+  const scheduleType = Object.keys(changes)[0];
+  if (scheduleType === "oneTimeSchedule") generateOneTimeSchedule();
+  else if (scheduleType === "regularTimeSchedule")
+    generateRegularTimeSchedule();
   else generateFrequentlyTimeSchedule();
 });
