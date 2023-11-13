@@ -12,8 +12,8 @@ const handleAlarmsForOneTime = () => {
     if (!scheduleList) return;
     Object.keys(scheduleList).forEach((item) => {
       chrome.alarms.clear(`${item}-oneTimeSchedule`);
-      
-      if(!scheduleList[item]) return;
+
+      if (!scheduleList[item]) return;
 
       const { taskDate, taskTime } = scheduleList[item];
 
@@ -43,7 +43,7 @@ const handleAlarmsForRegularTime = () => {
     Object.keys(scheduleList).forEach((item) => {
       chrome.alarms.clear(`${item}-regularTimeSchedule`);
 
-      if(!scheduleList[item]) return;
+      if (!scheduleList[item]) return;
 
       const { taskTime } = scheduleList[item];
       const [hours, minutes] = taskTime.split(":");
@@ -67,7 +67,7 @@ const handleAlarmsForFrequentlyTime = () => {
 
     if (!scheduleList) return;
     Object.keys(scheduleList).forEach((item) => {
-      if(!scheduleList[item]) return;
+      if (!scheduleList[item]) return;
       const { dayAndTime } = scheduleList[item];
 
       // It is need to be clear because someting after updating it might be reamin some alarm that set previously but rececntly it is unselected so so that alarm should be clear
@@ -75,7 +75,7 @@ const handleAlarmsForFrequentlyTime = () => {
         chrome.alarms.clear(`${i}_${item}-frequentlyTimeSchedule`);
 
       dayAndTime.forEach((eachDayAndTime) => {
-        if(!eachDayAndTime) return;
+        if (!eachDayAndTime) return;
 
         const { day, time } = eachDayAndTime;
 
@@ -145,15 +145,39 @@ const notification = (title, description, scheduleType) => {
   const notificationOptions = {
     type: "image",
     title: title,
-    message: description,
+    message:
+      description.length >= 30 ? description.slice(0, 30) + "..." : description,
     iconUrl: chrome.runtime.getURL("images/assets/128.png"),
     imageUrl: bannerImg,
     buttons: [
       {
         title: "Open",
-      }
-    ]
+      },
+    ],
   };
 
   chrome.notifications.create(notificationOptions);
+  chrome.notifications.onButtonClicked.addListener(() => {
+    chrome.windows.create(
+      {
+        type: "popup",
+        url: "message.html",
+        width: 500,
+        height: 600,
+      },
+      (window) => {
+        chrome.storage.local.get("message").then((result) => {
+          let messageData = result.message;
+          messageData = {
+            ...messageData,
+            messageTitle: title,
+            messageDescription: description,
+          };
+          chrome.storage.local.set({
+            message: messageData,
+          });
+        });
+      }
+    );
+  });
 };
