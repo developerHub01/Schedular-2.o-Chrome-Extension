@@ -148,6 +148,11 @@ const notification = (title, description, scheduleType) => {
     message: description,
     iconUrl: chrome.runtime.getURL("images/assets/128.png"),
     imageUrl: bannerImg,
+    buttons: [
+      {
+        title: "Open",
+      }
+    ]
   };
 
   chrome.notifications.create(notificationOptions);

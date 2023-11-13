@@ -94,6 +94,7 @@ const getFormatedDateAndTime = (time, date) => {
 const varifyTimeInput = (time, date) => {
   const currentTime = new Date();
   const givenTime = getFormatedDateAndTime(time, date);
+
   return givenTime > currentTime;
 };
 
@@ -223,6 +224,7 @@ const generateOneTimeSchedule = () => {
       const taskData = oneTimeScheduleList[i];
       const { taskTitle, taskDescription, taskTime, taskDate } = taskData;
 
+      console.log(varifyTimeInput(taskTime, taskData));
       oneTimeInnerContent.innerHTML += `
         <div class="taskToast" data-id="oneTimeSchedule-${i}">
           <div class="taskToastContent">
@@ -790,4 +792,10 @@ chrome.storage.onChanged.addListener((changes, area) => {
   else if (scheduleType === "regularTimeSchedule")
     generateRegularTimeSchedule();
   else generateFrequentlyTimeSchedule();
+});
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "openPopup") {
+    chrome.tabs.create({ url: "popup.html", active: true });
+  }
 });
