@@ -1,5 +1,4 @@
 chrome.storage.onChanged.addListener((changes, areaName) => {
-  console.log(Object.keys(changes)[0] === "oneTimeSchedule");
   const scheduleType = Object.keys(changes)[0];
   if (scheduleType === "oneTimeSchedule") handleAlarmsForOneTime();
   else if (scheduleType === "regularTimeSchedule") handleAlarmsForRegularTime();
@@ -7,7 +6,6 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
 });
 
 const handleAlarmsForOneTime = () => {
-  console.log("one time");
   chrome.storage.local.get("oneTimeSchedule").then((result) => {
     const scheduleList = result.oneTimeSchedule;
 
@@ -58,7 +56,6 @@ const handleAlarmsForRegularTime = () => {
   });
 };
 const handleAlarmsForFrequentlyTime = () => {
-  console.log("frequently");
   chrome.storage.local.get("frequentlyTimeSchedule").then((result) => {
     const scheduleList = result.frequentlyTimeSchedule;
 
@@ -103,6 +100,8 @@ const handleNotificationTriggerOneTime = (id, scheduleType) => {
   chrome.storage.local.get(scheduleType).then((result) => {
     const schedules = result[scheduleType];
 
+    if (!schedules) return;
+
     const { taskTitle, taskDescription } = schedules[id];
 
     notification(taskTitle, taskDescription, scheduleType);
@@ -118,6 +117,9 @@ const handleNotificationTriggerRegularTimeAndFrequentlyTime = (
   if (scheduleType === "frequentlyTimeSchedule") id = id.split("_")[1];
   chrome.storage.local.get(scheduleType).then((result) => {
     const schedules = result[scheduleType];
+
+    if (!schedules) return;
+
     const { taskTitle, taskDescription } = schedules[id];
 
     notification(taskTitle, taskDescription, scheduleType);

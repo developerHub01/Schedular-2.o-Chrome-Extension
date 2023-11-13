@@ -785,7 +785,6 @@ generateRegularTimeSchedule();
 generateFrequentlyTimeSchedule();
 
 chrome.storage.onChanged.addListener((changes, area) => {
-  console.log(changes);
   const scheduleType = Object.keys(changes)[0];
   if (scheduleType === "oneTimeSchedule") generateOneTimeSchedule();
   else if (scheduleType === "regularTimeSchedule")
