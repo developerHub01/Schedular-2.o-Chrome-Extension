@@ -110,22 +110,6 @@ taskType.forEach((item, i) => {
   });
 });
 
-// const ovserver = new IntersectionObserver(
-//   (item) => {
-//     item.forEach((task) => {
-//       if (task.isIntersecting) {
-//         task.target.classList.add("active");
-//       } else {
-//         task.target.classList.remove("active");
-//       }
-//     });
-//   },
-//   { threshold: 0.5 }
-// );
-// taskToast.forEach((item) => {
-//   ovserver.observe(item);
-// });
-
 hidePopUpIcons.forEach((item) => {
   item.addEventListener("click", (e) => {
     item.parentElement.parentElement.classList.remove("active");
@@ -299,22 +283,6 @@ const generateOneTimeSchedule = () => {
       `;
     }
 
-    const ovserver = new IntersectionObserver(
-      (item) => {
-        item.forEach((task) => {
-          if (task.isIntersecting) {
-            task.target.classList.add("active");
-          } else {
-            task.target.classList.remove("active");
-          }
-        });
-      },
-      { threshold: 0.5 }
-    );
-    taskToast.forEach((item) => {
-      ovserver.observe(item);
-    });
-
     interactiveOption();
   });
 };
@@ -387,21 +355,6 @@ const generateRegularTimeSchedule = () => {
         </div>
       `;
     }
-    const ovserver = new IntersectionObserver(
-      (item) => {
-        item.forEach((task) => {
-          if (task.isIntersecting) {
-            task.target.classList.add("active");
-          } else {
-            task.target.classList.remove("active");
-          }
-        });
-      },
-      { threshold: 0.5 }
-    );
-    taskToast.forEach((item) => {
-      ovserver.observe(item);
-    });
 
     interactiveOption();
   });
@@ -488,21 +441,6 @@ const generateFrequentlyTimeSchedule = () => {
       </div>
       `;
     }
-    const ovserver = new IntersectionObserver(
-      (item) => {
-        item.forEach((task) => {
-          if (task.isIntersecting) {
-            task.target.classList.add("active");
-          } else {
-            task.target.classList.remove("active");
-          }
-        });
-      },
-      { threshold: 0.5 }
-    );
-    taskToast.forEach((item) => {
-      ovserver.observe(item);
-    });
 
     interactiveOption();
   });
