@@ -254,6 +254,9 @@ textarea::-webkit-scrollbar-corner {
 .taskOption .right span {
   flex-shrink: 0;
   font-size: 23px;
+  aspect-ratio: 1;
+  width: 42px;
+  height: 42px;
   fill: #fff;
   position: relative;
   display: grid;
