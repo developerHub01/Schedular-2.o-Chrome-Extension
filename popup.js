@@ -232,9 +232,8 @@ const generateOneTimeSchedule = () => {
 
     handleNoItemAdded(oneTimeInnerContent);
 
-    if (Object.keys(oneTimeScheduleList).length) {
+    if (Object.keys(oneTimeScheduleList).length)
       oneTimeInnerContent.innerHTML = "";
-    }
 
     for (let i in oneTimeScheduleList) {
       const taskData = oneTimeScheduleList[i];
@@ -324,9 +323,8 @@ const generateRegularTimeSchedule = () => {
     const regularTimeScheduleList = result.regularTimeSchedule || {};
     handleNoItemAdded(regularTimeInnerTabContent);
 
-    if (Object.keys(regularTimeScheduleList).length) {
+    if (Object.keys(regularTimeScheduleList).length)
       regularTimeInnerTabContent.innerHTML = "";
-    }
     for (let i in regularTimeScheduleList) {
       const taskData = regularTimeScheduleList[i];
       const { taskTitle, taskDescription, taskTime } = taskData;
@@ -423,9 +421,9 @@ const generateFrequentlyTimeSchedule = () => {
     const frquentlyTimeScheduleList = result.frequentlyTimeSchedule || {};
     handleNoItemAdded(frequentlyTimeInnerContent);
 
-    if (Object.keys(frquentlyTimeScheduleList).length) {
+    if (Object.keys(frquentlyTimeScheduleList).length)
       frequentlyTimeInnerContent.innerHTML = "";
-    }
+
     for (let i in frquentlyTimeScheduleList) {
       const taskData = frquentlyTimeScheduleList[i];
       const { taskTitle, taskDescription, dayAndTime } = taskData;
