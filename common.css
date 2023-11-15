@@ -1,0 +1,108 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap");
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  outline: none;
+}
+textarea,
+input,
+button {
+  font-family: "Poppins", sans-serif;
+  display: block;
+}
+input[type="checkbox"],
+input[type="radio"] {
+  display: none;
+}
+.flex {
+  display: flex;
+}
+.flex-col {
+  flex-direction: column;
+}
+.gap-5 {
+  gap: 5px;
+}
+.w-full {
+  width: 100%;
+}
+.justify-center {
+  justify-content: center;
+  justify-content: space-between;
+}
+.justify-between {
+  justify-content: space-between;
+}
+.item-center {
+  align-items: center;
+}
+.hidden {
+  display: none !important;
+}
+.text-center {
+  text-align: center !important;
+}
+.tabContent .innerTabContent::-webkit-scrollbar,
+.dayWrapper::-webkit-scrollbar,
+textarea::-webkit-scrollbar {
+  width: 8px;
+}
+.tabContent .innerTabContent::-webkit-scrollbar-thumb,
+.dayWrapper::-webkit-scrollbar-thumb,
+textarea::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 4px;
+  height: 20px;
+}
+.tabContent .innerTabContent::-webkit-scrollbar-track,
+.dayWrapper::-webkit-scrollbar-track,
+textarea::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+.tabContent .innerTabContent::-webkit-scrollbar-corner,
+.dayWrapper::-webkit-scrollbar-corner,
+textarea::-webkit-scrollbar-corner {
+  background-color: transparent;
+}
+input,
+textarea {
+  width: 100%;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  resize: none;
+  transition: all 0.3s ease-in-out;
+}
+input:hover,
+textarea:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+textarea {
+  min-height: 200px;
+  max-height: 200px;
+}
+input::placeholder,
+textarea::placeholder {
+  color: rgba(255, 255, 255, 0.8);
+}
+button {
+  border: none;
+  background: rgba(255, 255, 255, 0.3);
+  color: #fff;
+  text-transform: capitalize;
+  padding: 8px 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+button:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+p {
+  font-size: 14px;
+}

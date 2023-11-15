@@ -224,7 +224,8 @@ const generateOneTimeSchedule = () => {
       const taskData = oneTimeScheduleList[i];
       const { taskTitle, taskDescription, taskTime, taskDate } = taskData;
 
-      console.log(varifyTimeInput(taskTime, taskData));
+      console.log(varifyTimeInput(taskTime, taskDate));
+      if (!varifyTimeInput(taskTime, taskDate)) continue;
       oneTimeInnerContent.innerHTML += `
         <div class="taskToast" data-id="oneTimeSchedule-${i}">
           <div class="taskToastContent">

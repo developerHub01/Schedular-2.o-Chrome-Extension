@@ -130,7 +130,6 @@ const handleNotificationTriggerRegularTimeAndFrequentlyTime = (
     if (!schedules) return;
 
     const { taskTitle, taskDescription } = schedules[id];
-
     notification(taskTitle, taskDescription, scheduleType);
   });
 };
@@ -146,7 +145,7 @@ const notification = (title, description, scheduleType) => {
     type: "image",
     title: title,
     message:
-      description.length >= 30 ? description.slice(0, 30) + "..." : description,
+      description.length >= 50 ? description.slice(0, 50) + "..." : description,
     iconUrl: chrome.runtime.getURL("images/assets/128.png"),
     imageUrl: bannerImg,
     buttons: [
@@ -157,13 +156,14 @@ const notification = (title, description, scheduleType) => {
   };
 
   chrome.notifications.create(notificationOptions);
+
   chrome.notifications.onButtonClicked.addListener(() => {
     chrome.windows.create(
       {
         type: "popup",
         url: "message.html",
-        width: 500,
-        height: 600,
+        width: 420,
+        height: 450,
       },
       (window) => {
         chrome.storage.local.get("message").then((result) => {
