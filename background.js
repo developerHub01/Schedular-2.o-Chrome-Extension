@@ -1,5 +1,22 @@
+chrome.action.setBadgeBackgroundColor({ color: "#ffffff" });
+
 chrome.storage.onChanged.addListener((changes, areaName) => {
   const scheduleType = Object.keys(changes)[0];
+
+  let totalSchedule = 0;
+  chrome.storage.local.get("oneTimeSchedule").then((result) => {
+    totalSchedule += Object.keys(result["oneTimeSchedule"] || {}).length;
+    chrome.storage.local.get("regularTimeSchedule").then((result) => {
+      totalSchedule += Object.keys(result["regularTimeSchedule"] || {}).length;
+      chrome.storage.local.get("frequentlyTimeSchedule").then((result) => {
+        totalSchedule += Object.keys(
+          result["frequentlyTimeSchedule"] || {}
+        ).length;
+        chrome.action.setBadgeText({ text: "" + (totalSchedule || "") });
+      });
+    });
+  });
+
   if (scheduleType === "oneTimeSchedule") handleAlarmsForOneTime();
   else if (scheduleType === "regularTimeSchedule") handleAlarmsForRegularTime();
   else handleAlarmsForFrequentlyTime();

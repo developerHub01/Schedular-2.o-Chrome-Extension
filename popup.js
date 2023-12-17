@@ -520,15 +520,20 @@ const handleAddItem = (addItemData) => {
   else handleAddItemFrequentlyTimeSchedule(addItemData);
 };
 clearTask.addEventListener("click", () => {
-  chrome.storage.local.remove("oneTimeScheduleNo");
-  chrome.storage.local.remove("oneTimeSchedule");
-  chrome.storage.local.remove("regularTimeScheduleNo");
-  chrome.storage.local.remove("regularTimeSchedule");
-  chrome.storage.local.remove("frequentlyTimeScheduleNo");
-  chrome.storage.local.remove("frequentlyTimeSchedule");
-  generateOneTimeSchedule();
-  generateRegularTimeSchedule();
-  generateFrequentlyTimeSchedule();
+  chrome.storage.local
+    .remove([
+      "oneTimeScheduleNo",
+      "oneTimeSchedule",
+      "regularTimeScheduleNo",
+      "regularTimeSchedule",
+      "frequentlyTimeScheduleNo",
+      "frequentlyTimeSchedule",
+    ])
+    .then(() => {
+      generateOneTimeSchedule();
+      generateRegularTimeSchedule();
+      generateFrequentlyTimeSchedule();
+    });
 });
 
 addTask.addEventListener("click", (e) => {
